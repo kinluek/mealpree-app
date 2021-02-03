@@ -20,6 +20,10 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 export const createUserWithEmailAndPassword = async (email: string, password: string): Promise<CreateUserResponse> => {
   try {
     const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    if (!userCredential.user) {
+      throw new Error('no user returned from createUserWithEmailAndPassword');
+    }
+    await userCredential.user.sendEmailVerification();
     return { userCredential, alternative: null };
   } catch (error) {
     if (error.code === AuthErrorCodes.EmailAlreadyInUse) {
