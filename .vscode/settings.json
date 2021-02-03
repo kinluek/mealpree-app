@@ -1,0 +1,10 @@
+{
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "editor.formatOnSave": true,
+    "cSpell.words": ["authed", "creds", "mealpree", "pgadmin"],
+    "editor.tabSize": 2,
+    "typescript.tsdk": "node_modules/typescript/lib"
+  }
+  
