@@ -1,38 +1,41 @@
 import { Link } from 'react-router-dom';
+import { Flex, Text } from 'rebass';
 import { useUserContext } from '../../context/user.context';
 import { auth } from '../../firebase/auth';
-import './header.styles.scss';
 
 const Header: React.FunctionComponent = () => {
-  const { user, setUser } = useUserContext();
+  const { user } = useUserContext();
 
   const signOut = () => {
-    auth
-      .signOut()
-      .then(() => setUser(null))
-      .catch(console.log);
+    auth.signOut().catch(console.log);
   };
 
   return (
-    <div className="header">
-      <Link className="logo-container" to="/">
-        Mealpree
+    <Flex color="white" bg="#66CDAA" justifyContent="space-between">
+      <Link to="/">
+        <Text p={2} fontWeight="bold" color="white">
+          mealpree
+        </Text>
       </Link>
-      <div className="options">
-        {user ? (
-          <div onClick={signOut}>Sign Out</div>
-        ) : (
-          <div>
-            <Link className="option" to="/signup">
+      {user ? (
+        <Flex>
+          <Text onClick={signOut}>Sign Out</Text>
+        </Flex>
+      ) : (
+        <Flex>
+          <Link to="/signup">
+            <Text p={2} fontWeight="bold" color="white">
               Sign Up
-            </Link>
-            <Link className="option" to="/signin">
+            </Text>
+          </Link>
+          <Link to="/signin">
+            <Text p={2} fontWeight="bold" color="white">
               Sign In
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
+            </Text>
+          </Link>
+        </Flex>
+      )}
+    </Flex>
   );
 };
 

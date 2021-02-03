@@ -1,7 +1,6 @@
 import React from 'react';
-import SignUp from './components/sign-up/sign-up.component';
-import SignIn from './components/sign-in/sign-in.component';
-import SignInLinkEmail from './components/sign-in-link-email/sign-in-link-email.component';
+import SignInPage from './pages/sign-in/sign-in.page';
+import SignUpPage from './pages/sign-up/sign-up.page';
 import Header from './components/header/header.component';
 import UserProvider from './context/user.context';
 import { Route, Switch } from 'react-router';
@@ -15,9 +14,8 @@ const App: React.FunctionComponent = () => {
         <Header />
         <Switch>
           <Route exact path="/" render={() => <h1>Welcome to Mealpree</h1>} />
-          <Route exact path="/signup" component={SignUp} />
-          <Route exact path="/signin" component={SignIn} />
-          <Route exact path="/signin-link-email" component={SignInLinkEmail} />
+          <Route exact path="/signup" component={SignUpPage} />
+          <Route exact path="/signin" component={SignInPage} />
         </Switch>
       </UserProvider>
     </div>

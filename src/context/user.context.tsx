@@ -3,15 +3,9 @@ import { useEffect } from 'react';
 import { auth } from '../firebase/auth';
 import type firebase from 'firebase';
 
-type User = {
-  id: string;
-};
-
 type UserContextValues = {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  credential: firebase.auth.AuthCredential | null;
-  setCredential: React.Dispatch<React.SetStateAction<firebase.auth.AuthCredential | null>>;
+  user: firebase.User | null;
+  setUser: React.Dispatch<React.SetStateAction<firebase.User | null>>;
 };
 
 export const UserContext = createContext<UserContextValues>({} as UserContextValues);
@@ -23,24 +17,22 @@ export const useUserContext = () => useContext(UserContext);
  * @param param0
  */
 const UserProvider: React.FunctionComponent = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [credential, setCredential] = useState<firebase.auth.AuthCredential | null>(null);
+  const [user, setUser] = useState<firebase.User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authed) => {
-      if (authed) {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
         console.log('signed in');
-        setUser({ id: authed.uid });
+        setUser(user);
       } else {
         console.log('not signed in');
         setUser(null);
       }
     });
-
     return unsubscribe;
   }, []);
 
-  return <UserContext.Provider value={{ user, setUser, credential, setCredential }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, setUser }}>{children}</UserContext.Provider>;
 };
 
 export default UserProvider;
