@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { useHistory } from 'react-router';
-import { auth, createUserWithEmailAndPassword } from '../../firebase';
+import { createUserWithEmailAndPassword } from '../../firebase/auth';
 
 const SignUp: React.FunctionComponent = () => {
   const [signUpDetails, setSignUpDetails] = useState({

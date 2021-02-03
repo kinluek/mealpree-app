@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useUserContext } from '../../context/user.context';
-import { auth } from '../../firebase';
+import { auth } from '../../firebase/auth';
 import './header.styles.scss';
 
 const Header: React.FunctionComponent = () => {

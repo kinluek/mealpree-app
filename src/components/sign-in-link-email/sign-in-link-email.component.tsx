@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import type firebase from 'firebase';
-import { linkCredentialWithEmail } from '../../firebase';
+import { linkCredentialWithEmail } from '../../firebase/auth';
 import { useHistory, useLocation } from 'react-router';
 
 type CredentialLocation = {

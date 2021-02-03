@@ -1,7 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
 import { useHistory } from 'react-router';
-import { auth, signInWithGoogle } from '../../firebase';
-import { AuthMethods } from '../../firebase/types';
+import { auth, signInWithGoogle } from '../../firebase/auth';
 
 const SignIn: React.FunctionComponent = () => {
   const [signInDetails, setSignInDetails] = useState({

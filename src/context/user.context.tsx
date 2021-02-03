@@ -1,7 +1,7 @@
-import React, { useState, createContext, useContext } from "react";
-import { useEffect } from "react";
-import { auth } from "../firebase";
-import type firebase from "firebase";
+import React, { useState, createContext, useContext } from 'react';
+import { useEffect } from 'react';
+import { auth } from '../firebase/auth';
+import type firebase from 'firebase';
 
 type User = {
   id: string;
@@ -11,14 +11,10 @@ type UserContextValues = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   credential: firebase.auth.AuthCredential | null;
-  setCredential: React.Dispatch<
-    React.SetStateAction<firebase.auth.AuthCredential | null>
-  >;
+  setCredential: React.Dispatch<React.SetStateAction<firebase.auth.AuthCredential | null>>;
 };
 
-export const UserContext = createContext<UserContextValues>(
-  {} as UserContextValues
-);
+export const UserContext = createContext<UserContextValues>({} as UserContextValues);
 
 export const useUserContext = () => useContext(UserContext);
 
@@ -28,18 +24,15 @@ export const useUserContext = () => useContext(UserContext);
  */
 const UserProvider: React.FunctionComponent = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [
-    credential,
-    setCredential,
-  ] = useState<firebase.auth.AuthCredential | null>(null);
+  const [credential, setCredential] = useState<firebase.auth.AuthCredential | null>(null);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authed) => {
       if (authed) {
-        console.log("signed in");
+        console.log('signed in');
         setUser({ id: authed.uid });
       } else {
-        console.log("not signed in");
+        console.log('not signed in');
         setUser(null);
       }
     });
@@ -47,11 +40,7 @@ const UserProvider: React.FunctionComponent = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  return (
-    <UserContext.Provider value={{ user, setUser, credential, setCredential }}>
-      {children}
-    </UserContext.Provider>
-  );
+  return <UserContext.Provider value={{ user, setUser, credential, setCredential }}>{children}</UserContext.Provider>;
 };
 
 export default UserProvider;
