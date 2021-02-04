@@ -14,6 +14,7 @@ export enum AuthErrorCodes {
 export type CreateUserResponse = {
   userCredential: firebase.auth.UserCredential | null;
   alternative: {
+    error: Error;
     method: string | AuthMethods;
   } | null;
 };
@@ -23,6 +24,7 @@ export type SignInWithEmailResponse = CreateUserResponse;
 export type SignInWithProviderResponse = {
   userCredential: firebase.auth.UserCredential | null;
   alternative: {
+    error: Error;
     email: string;
     credential: firebase.auth.AuthCredential;
     method: string | AuthMethods;

@@ -1,100 +1,166 @@
-import { useState } from 'react';
-import { Box, Flex, Button } from 'rebass';
-import { Label, Input } from '@rebass/forms';
-import { createUserWithEmailAndPassword } from '../../firebase/auth';
+import React, { useState } from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Checkbox from '@material-ui/core/Checkbox';
+import Alert from '@material-ui/lab/Alert';
+import Link from '@material-ui/core/Link';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
+import { createUserWithEmailAndPassword } from '../../firebase/auth';
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  alert: {
+    marginBottom: theme.spacing(3),
+    width: '100%',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(3),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+}));
 
 const SignUpPage: React.FunctionComponent = () => {
+  const classes = useStyles();
+
   const [firstName, setFirstName] = useState('');
-  const [surname, setSurname] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
+  const [error, setError] = useState<Error | null>(null);
   const history = useHistory();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLDivElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       if (confirmedPassword !== password) {
-        alert('passwords do not match');
-        return;
+        throw new Error('passwords do not match');
       }
 
-      const { alternative } = await createUserWithEmailAndPassword(email, password);
-      if (alternative) {
-        alert('email already in use');
-        return;
-      }
-
+      await createUserWithEmailAndPassword(email, password);
       history.push('/');
     } catch (error) {
-      console.log(error);
+      setError(error);
     }
   };
 
   return (
-    <Flex justifyContent="center">
-      <Box as="form" onSubmit={handleSubmit} py={3} sx={{ justifyContent: 'center' }}>
-        <Flex mx={-2} mb={3} flexDirection="column">
-          <Box my={1}>
-            <Label htmlFor="first-name">First Name</Label>
-            <Input
-              id="first-name"
-              name="first-name"
-              type="text"
-              placeholder="first name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-            />
-          </Box>
-          <Box my={1}>
-            <Label htmlFor="surname">Surname</Label>
-            <Input
-              id="surname"
-              name="surname"
-              type="text"
-              placeholder="surname"
-              value={surname}
-              onChange={(e) => setSurname(e.target.value)}
-            />
-          </Box>
-          <Box my={1}>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Box>
-          <Box my={1}>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Box>
-          <Box my={1}>
-            <Label htmlFor="confirm-password">Confirm Password</Label>
-            <Input
-              id="confirm-password"
-              name="confirm-password"
-              type="password"
-              placeholder="confirm password"
-              value={confirmedPassword}
-              onChange={(e) => setConfirmedPassword(e.target.value)}
-            />
-          </Box>
-          <Button bg="#66CDAA">Sign Up</Button>
-        </Flex>
-      </Box>
-    </Flex>
+    <Container component="main" maxWidth="xs">
+      <div className={classes.paper}>
+        {error ? (
+          <Alert className={classes.alert} severity="error" onClick={() => setError(null)}>
+            {error.message}
+          </Alert>
+        ) : null}
+        <Typography component="h1" variant="h5">
+          Sign up
+        </Typography>
+        <form className={classes.form} noValidate onSubmit={handleSubmit}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                autoComplete="fname"
+                name="firstName"
+                variant="outlined"
+                required
+                fullWidth
+                id="firstName"
+                label="First Name"
+                autoFocus
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="lastName"
+                label="Last Name"
+                name="lastName"
+                autoComplete="lname"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                name="confirmPassword"
+                label="Confirm Password"
+                type="password"
+                id="confirmPassword"
+                value={confirmedPassword}
+                onChange={(e) => setConfirmedPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox value="allowExtraEmails" color="primary" />}
+                label="I want to receive inspiration, marketing promotions and updates via email."
+              />
+            </Grid>
+          </Grid>
+          <Button type="submit" fullWidth variant="contained" color="default" className={classes.submit}>
+            Sign Up
+          </Button>
+          <Grid container justify="flex-end">
+            <Grid item>
+              <Link onClick={() => history.push('/signin')} variant="body2">
+                Already have an account? Sign in
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+    </Container>
   );
 };
 
