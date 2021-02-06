@@ -11,6 +11,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
 import { createUserWithEmailAndPassword } from '../../firebase/auth';
+import { useUserContext } from '../../context/user.context';
+import { setAndGetUser } from '../../firebase/firestore';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -45,16 +47,33 @@ const SignUpPage: React.FunctionComponent = () => {
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [error, setError] = useState<Error | null>(null);
+
+  const { setUserState } = useUserContext();
   const history = useHistory();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
+      if (!firstName) {
+        throw new Error('please enter first name');
+      }
+      if (!lastName) {
+        throw new Error('please enter last name');
+      }
+      if (!email) {
+        throw new Error('please enter email');
+      }
+      if (!password) {
+        throw new Error('please enter password');
+      }
       if (confirmedPassword !== password) {
         throw new Error('passwords do not match');
       }
 
-      await createUserWithEmailAndPassword(email, password);
+      const user = await createUserWithEmailAndPassword(email, password);
+      const { userDoc } = await setAndGetUser(user, { firstName, lastName, email });
+      setUserState({ user, userDoc: userDoc });
+
       history.push('/');
     } catch (error) {
       setError(error);

@@ -11,6 +11,8 @@ import Container from '@material-ui/core/Container';
 import { useState } from 'react';
 import { useHistory } from 'react-router';
 import { signInWithEmailAndPassword, signInWithGoogle } from '../../firebase/auth';
+import { setAndGetUser } from '../../firebase/firestore';
+import { useUserContext } from '../../context/user.context';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -42,26 +44,33 @@ const SignInPage: React.FunctionComponent = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<Error | null>(null);
+
+  const { setUserState } = useUserContext();
   const history = useHistory();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      await signInWithEmailAndPassword(email, password);
+      const { user } = await signInWithEmailAndPassword(email, password);
+      if (!user) throw new Error('error signing in');
+      const { userDoc } = await setAndGetUser(user);
+      setUserState({ user, userDoc: userDoc });
       history.push('/');
     } catch (error) {
+      console.log(error);
       setError(error);
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      const { userCredential } = await signInWithGoogle();
-      if (!userCredential) {
-        throw new Error('no credential returned from signInWithGoogle');
-      }
+      const { user } = await signInWithGoogle();
+      if (!user) throw new Error('error signing in');
+      const { userDoc } = await setAndGetUser(user);
+      setUserState({ user, userDoc: userDoc });
       history.push('/');
     } catch (error) {
+      console.log(error);
       setError(error);
     }
   };

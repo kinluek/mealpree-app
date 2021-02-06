@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 const Header: React.FunctionComponent = () => {
   const classes = useStyles();
   const history = useHistory();
-  const { user } = useUserContext();
+  const { userState } = useUserContext();
 
   const signOut = () => {
     return auth
@@ -56,7 +56,7 @@ const Header: React.FunctionComponent = () => {
             mealpree
           </Typography>
         </div>
-        {!user ? (
+        {!userState ? (
           <Button onClick={() => history.push('/signin')} color="primary" variant="outlined" className={classes.link}>
             Login
           </Button>

@@ -17,11 +17,11 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
  * @param email
  * @param password
  */
-export const createUserWithEmailAndPassword = async (
-  email: string,
-  password: string
-): Promise<firebase.auth.UserCredential> => {
-  return await auth.createUserWithEmailAndPassword(email, password);
+export const createUserWithEmailAndPassword = async (email: string, password: string): Promise<firebase.User> => {
+  const cred = await auth.createUserWithEmailAndPassword(email, password);
+  if (!cred.user) throw new Error('error creating user, no user returned');
+  await cred.user.sendEmailVerification();
+  return cred.user;
 };
 
 /**
@@ -43,22 +43,8 @@ export const signInWithEmailAndPassword = async (
  * with link the new credential.
  * @param provider
  */
-export const signInWithPopup = async (provider: firebase.auth.AuthProvider): Promise<SignInWithProviderResponse> => {
-  try {
-    const userCredential = await auth.signInWithPopup(provider);
-    return { userCredential, alternative: null };
-  } catch (error) {
-    if (error.code === AuthErrorCodes.DifferentCredentialsExists) {
-      const credential = error.pendingCred;
-      const email = error.email;
-      const methods = await auth.fetchSignInMethodsForEmail(email);
-      return {
-        userCredential: null,
-        alternative: { email, credential, method: methods[0], error },
-      };
-    }
-    throw error;
-  }
+export const signInWithPopup = async (provider: firebase.auth.AuthProvider): Promise<firebase.auth.UserCredential> => {
+  return await auth.signInWithPopup(provider);
 };
 
 /**
