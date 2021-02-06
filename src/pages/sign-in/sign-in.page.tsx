@@ -14,7 +14,6 @@ import { signInWithEmailAndPassword, signInWithGoogle } from '../../firebase/aut
 import { setAndGetUser } from '../../firebase/firestore';
 import { useUserContext } from '../../context/user.context';
 
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -46,8 +45,12 @@ const SignInPage: React.FunctionComponent = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<Error | null>(null);
 
-  const { setUserState } = useUserContext();
+  const { userState, setUserState } = useUserContext();
   const history = useHistory();
+
+  if (userState) {
+    history.push('/');
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -56,7 +59,6 @@ const SignInPage: React.FunctionComponent = () => {
       if (!user) throw new Error('error signing in');
       const { userDoc } = await setAndGetUser(user);
       setUserState({ user, userDoc: userDoc });
-      history.push('/');
     } catch (error) {
       console.log(error);
       setError(error);
@@ -69,7 +71,6 @@ const SignInPage: React.FunctionComponent = () => {
       if (!user) throw new Error('error signing in');
       const { userDoc } = await setAndGetUser(user);
       setUserState({ user, userDoc: userDoc });
-      history.push('/');
     } catch (error) {
       console.log(error);
       setError(error);

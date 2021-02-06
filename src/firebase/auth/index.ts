@@ -1,7 +1,5 @@
 import firebase from '../';
 
-import { AuthErrorCodes, SignInWithProviderResponse } from './types';
-
 /**
  * Auth service for the default app.
  */
