@@ -14,7 +14,6 @@ import { createUserWithEmailAndPassword } from '../../firebase/auth';
 import { useUserContext } from '../../context/user.context';
 import { setAndGetUser } from '../../firebase/firestore';
 
-
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -49,8 +48,12 @@ const SignUpPage: React.FunctionComponent = () => {
   const [confirmedPassword, setConfirmedPassword] = useState('');
   const [error, setError] = useState<Error | null>(null);
 
-  const { setUserState } = useUserContext();
+  const { userState, setUserState } = useUserContext();
   const history = useHistory();
+
+  if (userState) {
+    history.push('/');
+  }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -74,8 +77,6 @@ const SignUpPage: React.FunctionComponent = () => {
       const user = await createUserWithEmailAndPassword(email, password);
       const { userDoc } = await setAndGetUser(user, { firstName, lastName, email });
       setUserState({ user, userDoc: userDoc });
-
-      history.push('/');
     } catch (error) {
       setError(error);
     }
