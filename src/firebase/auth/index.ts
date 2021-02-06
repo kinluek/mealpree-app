@@ -1,6 +1,6 @@
 import firebase from '../';
 
-import { AuthErrorCodes, CreateUserResponse, SignInWithEmailResponse, SignInWithProviderResponse } from './types';
+import { AuthErrorCodes, SignInWithProviderResponse } from './types';
 
 /**
  * Auth service for the default app.
@@ -17,21 +17,11 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
  * @param email
  * @param password
  */
-export const createUserWithEmailAndPassword = async (email: string, password: string): Promise<CreateUserResponse> => {
-  try {
-    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-    if (!userCredential.user) {
-      throw new Error('no user returned from createUserWithEmailAndPassword');
-    }
-    await userCredential.user.sendEmailVerification();
-    return { userCredential, alternative: null };
-  } catch (error) {
-    if (error.code === AuthErrorCodes.EmailAlreadyInUse) {
-      const methods = await auth.fetchSignInMethodsForEmail(email);
-      return { userCredential: null, alternative: { method: methods[0] } };
-    }
-    throw error;
-  }
+export const createUserWithEmailAndPassword = async (email: string, password: string): Promise<firebase.User> => {
+  const cred = await auth.createUserWithEmailAndPassword(email, password);
+  if (!cred.user) throw new Error('error creating user, no user returned');
+  await cred.user.sendEmailVerification();
+  return cred.user;
 };
 
 /**
@@ -39,22 +29,11 @@ export const createUserWithEmailAndPassword = async (email: string, password: st
  * @param email
  * @param password
  */
-export const signInWithEmailAndPassword = async (email: string, password: string): Promise<SignInWithEmailResponse> => {
-  try {
-    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-    return { userCredential, alternative: null };
-  } catch (error) {
-    if (error.code === AuthErrorCodes.WrongPassword) {
-      const methods = await auth.fetchSignInMethodsForEmail(email);
-      if (methods.length > 0) {
-        return {
-          userCredential: null,
-          alternative: { method: methods[0] },
-        };
-      }
-    }
-    throw error;
-  }
+export const signInWithEmailAndPassword = async (
+  email: string,
+  password: string
+): Promise<firebase.auth.UserCredential> => {
+  return auth.signInWithEmailAndPassword(email, password);
 };
 
 /**
@@ -64,22 +43,8 @@ export const signInWithEmailAndPassword = async (email: string, password: string
  * with link the new credential.
  * @param provider
  */
-export const signInWithPopup = async (provider: firebase.auth.AuthProvider): Promise<SignInWithProviderResponse> => {
-  try {
-    const userCredential = await auth.signInWithPopup(provider);
-    return { userCredential, alternative: null };
-  } catch (error) {
-    if (error.code === AuthErrorCodes.DifferentCredentialsExists) {
-      const credential = error.pendingCred;
-      const email = error.email;
-      const methods = await auth.fetchSignInMethodsForEmail(email);
-      return {
-        userCredential: null,
-        alternative: { email, credential, method: methods[0] },
-      };
-    }
-    throw error;
-  }
+export const signInWithPopup = async (provider: firebase.auth.AuthProvider): Promise<firebase.auth.UserCredential> => {
+  return await auth.signInWithPopup(provider);
 };
 
 /**

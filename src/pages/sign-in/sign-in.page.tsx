@@ -1,5 +1,6 @@
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Alert from '@material-ui/lab/Alert';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
@@ -10,6 +11,9 @@ import Container from '@material-ui/core/Container';
 import { useState } from 'react';
 import { useHistory } from 'react-router';
 import { signInWithEmailAndPassword, signInWithGoogle } from '../../firebase/auth';
+import { setAndGetUser } from '../../firebase/firestore';
+import { useUserContext } from '../../context/user.context';
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -17,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  alert: {
+    marginBottom: theme.spacing(3),
+    width: '100%',
   },
   avatar: {
     margin: theme.spacing(1),
@@ -36,36 +44,46 @@ const SignInPage: React.FunctionComponent = () => {
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<Error | null>(null);
+
+  const { setUserState } = useUserContext();
   const history = useHistory();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const { userCredential } = await signInWithEmailAndPassword(email, password);
-      if (!userCredential) {
-        throw new Error('no user returned from firebase signInWithEmailAndPassword');
-      }
+      const { user } = await signInWithEmailAndPassword(email, password);
+      if (!user) throw new Error('error signing in');
+      const { userDoc } = await setAndGetUser(user);
+      setUserState({ user, userDoc: userDoc });
       history.push('/');
     } catch (error) {
       console.log(error);
+      setError(error);
     }
   };
 
   const handleGoogleSignIn = async () => {
     try {
-      const { userCredential } = await signInWithGoogle();
-      if (!userCredential) {
-        throw new Error('no credential returned from signInWithGoogle');
-      }
+      const { user } = await signInWithGoogle();
+      if (!user) throw new Error('error signing in');
+      const { userDoc } = await setAndGetUser(user);
+      setUserState({ user, userDoc: userDoc });
       history.push('/');
     } catch (error) {
       console.log(error);
+      setError(error);
     }
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
+        {error ? (
+          <Alert className={classes.alert} severity="error" onClick={() => setError(null)}>
+            {error.message}
+          </Alert>
+        ) : null}
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>

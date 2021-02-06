@@ -3,6 +3,7 @@ import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Alert from '@material-ui/lab/Alert';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
@@ -10,6 +11,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
 import { createUserWithEmailAndPassword } from '../../firebase/auth';
+import { useUserContext } from '../../context/user.context';
+import { setAndGetUser } from '../../firebase/firestore';
+
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -17,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+  },
+  alert: {
+    marginBottom: theme.spacing(3),
+    width: '100%',
   },
   avatar: {
     margin: theme.spacing(1),
@@ -39,31 +47,48 @@ const SignUpPage: React.FunctionComponent = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmedPassword, setConfirmedPassword] = useState('');
+  const [error, setError] = useState<Error | null>(null);
+
+  const { setUserState } = useUserContext();
   const history = useHistory();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
+      if (!firstName) {
+        throw new Error('please enter first name');
+      }
+      if (!lastName) {
+        throw new Error('please enter last name');
+      }
+      if (!email) {
+        throw new Error('please enter email');
+      }
+      if (!password) {
+        throw new Error('please enter password');
+      }
       if (confirmedPassword !== password) {
-        alert('passwords do not match');
-        return;
+        throw new Error('passwords do not match');
       }
 
-      const { alternative } = await createUserWithEmailAndPassword(email, password);
-      if (alternative) {
-        alert('email already in use');
-        return;
-      }
+      const user = await createUserWithEmailAndPassword(email, password);
+      const { userDoc } = await setAndGetUser(user, { firstName, lastName, email });
+      setUserState({ user, userDoc: userDoc });
 
       history.push('/');
     } catch (error) {
-      console.log(error);
+      setError(error);
     }
   };
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
+        {error ? (
+          <Alert className={classes.alert} severity="error" onClick={() => setError(null)}>
+            {error.message}
+          </Alert>
+        ) : null}
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
