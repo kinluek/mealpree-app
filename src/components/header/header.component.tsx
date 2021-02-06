@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
 const Header: React.FunctionComponent = () => {
   const classes = useStyles();
   const history = useHistory();
+
   const { userState } = useUserContext();
 
   const signOut = () => {

@@ -14,6 +14,7 @@ import { createUserWithEmailAndPassword } from '../../firebase/auth';
 import { useUserContext } from '../../context/user.context';
 import { setAndGetUser } from '../../firebase/firestore';
 
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
