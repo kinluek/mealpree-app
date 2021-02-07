@@ -4,6 +4,10 @@ import Models from './models';
 
 const firestore = firebase.firestore();
 
+if (window.location.hostname === 'localhost') {
+  firestore.useEmulator('localhost', 8080);
+}
+
 /**
  * Creates a new user using the firebase.User and extra details provided. Should be called on
  * user sign up and oauth sign in. It only creates a new user document if one does not already

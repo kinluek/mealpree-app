@@ -5,6 +5,10 @@ import firebase from '../';
  */
 export const auth = firebase.auth();
 
+if (window.location.hostname === 'localhost') {
+  auth.useEmulator('http://localhost:9099');
+}
+
 const googleProvider = new firebase.auth.GoogleAuthProvider();
 googleProvider.addScope('email');
 googleProvider.setCustomParameters({ prompt: 'select_account' });
