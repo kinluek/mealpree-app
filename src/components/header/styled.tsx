@@ -9,21 +9,21 @@ export const StyledHeader = withTheme(styled(AppBar)`
   border-bottom: 1px solid ${p => p.theme.palette.divider};
 `);
 
-export const StyledToolbar = withTheme(styled(Toolbar)`
+export const StyledToolbar = styled(Toolbar)`
   flex-wrap: wrap;
-`);
+`;
 
-export const StyledLogoContainer = withTheme(styled.div`
+export const StyledLogoContainer = styled.div`
   flex-grow: 1;
-`);
+`;
 
-export const StyledLogo = withTheme(styled(Typography)`
+export const StyledLogo = styled(Typography)`
   display: inline-block;
 
   &:hover {
     cursor: pointer;
   }
-`);
+`;
 
 export const StyledLogInOutButton = withTheme(styled(Button)`
   margin: ${p => p.theme.spacing(1, 1.5)};
