@@ -27,6 +27,11 @@ describe('users', () => {
     await firebase.clearFirestoreData({ projectId: TEST_FIREBASE_PROJECT_ID });
   });
 
+  afterAll(async () => {
+    await db.terminate();
+    await db.clearPersistence();
+  });
+
   test('authed users can create and get their own document', async () => {
     const doc: Models.User = {
       displayName: 'alice',
