@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import Footer from '../../components/footer';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -88,13 +89,7 @@ const HomePage: React.FunctionComponent = () => {
           </Grid>
         </Container>
       </main>
-      {/* Footer */}
-      <footer className={classes.footer}>
-        <Typography variant="subtitle1" align="center" color="textSecondary" component="p">
-          Contact us for further details!
-        </Typography>
-      </footer>
-      {/* End footer */}
+      <Footer label="Contact us for further details!" />
     </React.Fragment>
   );
 };

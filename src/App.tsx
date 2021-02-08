@@ -2,7 +2,7 @@ import React from 'react';
 import SignInPage from './pages/sign-in/sign-in.page';
 import SignUpPage from './pages/sign-up/sign-up.page';
 import HomePage from './pages/home-page/homepage.page';
-import Header from './components/header/header.component';
+import Header from './components/header';
 import UserProvider from './context/user.context';
 import { Route, Switch } from 'react-router';
 import CssBaseline from '@material-ui/core/CssBaseline';
