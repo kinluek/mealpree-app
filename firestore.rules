@@ -2,13 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function matchUserSchema() {
-      return request.resource.data.keys().hasOnly(["displayName", "firstName", "lastName", "email", "createdAt"])
+    function matchAuthUid(uid) {
+      return request.auth.uid == uid
     }
 
     match /users/{userUid} {
-      allow create: if request.auth.uid == userUid && matchUserSchema();
-      allow read: if request.auth.uid == userUid;
+      
+      allow read: if matchAuthUid(userUid);
     }
   }
 }
