@@ -40,14 +40,14 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SignInPage: React.FunctionComponent = () => {
+  const { userState, setUserState } = useUserContext();
+
   const classes = useStyles();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<Error | null>(null);
 
-  const { userState, setUserState } = useUserContext();
   const history = useHistory();
-
   if (userState) {
     history.push('/');
   }
