@@ -52,6 +52,10 @@ const SignInPage: React.FunctionComponent = () => {
     history.push('/');
   }
 
+  if (userState) {
+    history.push('/');
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
