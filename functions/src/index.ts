@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import admin from 'firebase-admin';
 import type { UserDocData } from './types';
 
+
 admin.initializeApp();
 
 const db = admin.firestore();

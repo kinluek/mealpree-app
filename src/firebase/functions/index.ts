@@ -4,6 +4,7 @@ import Models from '../firestore/models';
 
 const functions = firebase.app().functions('europe-west2');
 
+
 if (window.location.hostname === 'localhost') {
   functions.useEmulator('localhost', 5001);
 }
