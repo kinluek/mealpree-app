@@ -20,7 +20,6 @@ export const useUserContext = () => useContext(UserContext);
 
 /**
  * Provides the context for an authed user.
- * @param param0
  */
 const UserProvider: React.FunctionComponent = ({ children }) => {
   const [userState, setUserState] = useState<UserState | null>(null);
@@ -28,10 +27,8 @@ const UserProvider: React.FunctionComponent = ({ children }) => {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
-        console.log('signed in');
         setUserState((preState) => (preState ? { ...preState, user } : { user, userDoc: null }));
       } else {
-        console.log('not signed in');
         setUserState(null);
       }
     });

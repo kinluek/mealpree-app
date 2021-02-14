@@ -49,7 +49,7 @@ const SignInPage: React.FunctionComponent = () => {
 
   const history = useHistory();
 
-  if (userState) {
+  if (userState?.userDoc) {
     history.push('/');
   }
 

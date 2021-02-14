@@ -9,9 +9,18 @@ name: Deploy to Firebase Hosting on merge
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    env:
+      FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+
       - run: npm ci && npm run build
+      - run: cd ./functions && npm ci && npm run build
+      - run: sudo npm install -g firebase-tools
+
+      - name: Deploy functions and firstore rules
+        run: firebase deploy --only functions,firestore:rules --force
+
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'

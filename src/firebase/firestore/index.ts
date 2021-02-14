@@ -20,7 +20,6 @@ export const setAndGetUser = async (user: firebase.User, extra?: ExtraUserDetail
   const userRef = firestore.doc(`users/${user.uid}`);
   const snapShot = await userRef.get();
   let userDoc = snapShot.data() as Models.User;
-
   if (!snapShot.exists) {
     userDoc = await createUserDocFunction({
       email: user.email,
@@ -28,6 +27,5 @@ export const setAndGetUser = async (user: firebase.User, extra?: ExtraUserDetail
       ...extra,
     });
   }
-
   return { userRef, userDoc };
 };
