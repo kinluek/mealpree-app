@@ -9,7 +9,7 @@ namespace Models {
     firstName?: string;
     lastName?: string;
     email: string;
-    createdAt: Date;
+    createdAt: Date | string;
     orders?: UserOrder[];
   };
 

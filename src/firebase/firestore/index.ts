@@ -22,29 +22,12 @@ export const setAndGetUser = async (user: firebase.User, extra?: ExtraUserDetail
   let userDoc = snapShot.data() as Models.User;
 
   if (!snapShot.exists) {
-    await new Promise((resolve, reject) => {
-      const unsubscribe = userRef.onSnapshot({
-        next: (doc) => {
-          if (!doc.metadata.hasPendingWrites) {
-            userDoc = doc.data() as Models.User;
-            unsubscribe();
-            resolve(null);
-          }
-        },
-        error: (err) => {
-          unsubscribe();
-          reject(err);
-        },
-      });
-      createUserDocFunction({
-        email: user.email,
-        displayName: user.displayName,
-        ...extra,
-      }).catch((err) => {
-        unsubscribe();
-        reject(err);
-      });
+    userDoc = await createUserDocFunction({
+      email: user.email,
+      displayName: user.displayName,
+      ...extra,
     });
   }
+
   return { userRef, userDoc };
 };

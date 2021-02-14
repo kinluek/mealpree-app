@@ -48,9 +48,6 @@ const SignInPage: React.FunctionComponent = () => {
   const [error, setError] = useState<Error | null>(null);
 
   const history = useHistory();
-  if (userState) {
-    history.push('/');
-  }
 
   if (userState) {
     history.push('/');
