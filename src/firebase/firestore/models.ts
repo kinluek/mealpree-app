@@ -2,14 +2,15 @@ import firebase from 'firebase';
 
 namespace Models {
   /**
-   * Represents the Users collection schema.
+   * Represents the Users collection schema. User doc should only be accessible by the user themselves.
    */
   export type User = {
     displayName?: string;
     firstName?: string;
     lastName?: string;
     email: string;
-    createdAt: Date | string;
+    createdAt: firebase.firestore.Timestamp | Date | string;
+    associatedVendorId?: string;
     orders?: UserOrder[];
   };
 
@@ -31,9 +32,11 @@ namespace Models {
     businessName: string;
     location: firebase.firestore.GeoPoint;
     address: {
-      houseNameNumber: string;
-      street: string;
+      addressLineOne: string;
+      addressLineTWo?: string;
+      addressLineThree?: string;
       city: string;
+      postCode: string;
     };
     createdAt: Date;
     meals?: Meal[];
@@ -41,16 +44,18 @@ namespace Models {
   };
 
   /**
-   * Represents the Meals collection schema - subcollection of Vendor
+   * Represents the Meals collection schema - subcollection of Vendor. Meals should be publicly readable.
    */
   export type Meal = {
+    id?: string;
     price: number; // price in pennies
     name: string;
+    description: string;
     createdAt: Date;
   };
 
   /**
-   * Represents the VendorOrders collection schema - subcollection of Vendor
+   * Represents the VendorOrders collection schema - subcollection of Vendor. Readable by the vendor owner.
    */
   export type VendorOrder = {
     customerId: string;

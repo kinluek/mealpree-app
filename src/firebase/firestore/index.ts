@@ -29,3 +29,19 @@ export const setAndGetUser = async (user: firebase.User, extra?: ExtraUserDetail
   }
   return { userRef, userDoc };
 };
+
+export const getUser = (userId: string): firebase.firestore.DocumentReference<firebase.firestore.DocumentData> => {
+  return firestore.doc(`users/${userId}`);
+};
+
+export const getVendor = async (vendorId: string): Promise<Models.Vendor> => {
+  const snapshot = await firestore.doc(`vendors/${vendorId}`).get();
+  if (!snapshot.exists) throw new Error(`vendor ${vendorId} does not exist`);
+  return snapshot.data() as Models.Vendor;
+};
+
+export const getMealsForVendor = async (vendorId: string): Promise<Models.Meal[]> => {
+  const collectionSnapshot = await firestore.collection(`vendors/${vendorId}/meals`).get();
+  const meals = collectionSnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Models.Meal[];
+  return meals;
+};

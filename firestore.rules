@@ -10,5 +10,13 @@ service cloud.firestore {
       
       allow read: if matchAuthUid(userUid);
     }
+
+    match /vendors/{vendorId} {
+      allow read: if true;
+
+      match /meals/{mealId} {
+        allow read: if true;
+      }
+    }
   }
 }

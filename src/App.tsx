@@ -2,6 +2,7 @@ import React from 'react';
 import SignInPage from './pages/sign-in/sign-in.page';
 import SignUpPage from './pages/sign-up/sign-up.page';
 import HomePage from './pages/home-page/homepage.page';
+import MyShopPage from './pages/my-shop/my-shop.page';
 import Header from './components/header/header.component';
 import UserProvider from './context/user.context';
 import { Route, Switch } from 'react-router';
@@ -16,6 +17,7 @@ const App: React.FunctionComponent = () => {
           <Header />
           <Switch>
             <Route exact path="/" component={HomePage} />
+            <Route exact path="/myshop" component={MyShopPage} />
             <Route exact path="/signup" component={SignUpPage} />
             <Route exact path="/signin" component={SignInPage} />
           </Switch>

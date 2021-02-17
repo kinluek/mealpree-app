@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { auth } from '../firebase/auth';
 import type firebase from 'firebase';
 import Models from '../firebase/firestore/models';
+import { getUser } from '../firebase/firestore';
 
 type UserState = {
   user: firebase.User;
@@ -25,9 +26,19 @@ const UserProvider: React.FunctionComponent = ({ children }) => {
   const [userState, setUserState] = useState<UserState | null>(null);
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        setUserState((preState) => (preState ? { ...preState, user } : { user, userDoc: null }));
+        const userRef = getUser(user.uid);
+        const snapShot = await userRef.get();
+        if (snapShot.exists) {
+          const userDoc = snapShot.data() as Models.User;
+          if (userDoc.createdAt && typeof (userDoc.createdAt as firebase.firestore.Timestamp).toDate === 'function') {
+            userDoc.createdAt = (userDoc.createdAt as firebase.firestore.Timestamp).toDate();
+          }
+          setUserState((preState) => (preState ? { ...preState, user } : { user, userDoc }));
+        } else {
+          setUserState((preState) => (preState ? { ...preState, user } : { user, userDoc: null }));
+        }
       } else {
         setUserState(null);
       }

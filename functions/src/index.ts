@@ -43,7 +43,7 @@ const parseCreatUserDocData = (data: any): UserDocData => {
   const doc: UserDocData = {
     email: data.email,
     displayName: data.displayName ? data.displayName : data.firstName,
-    createdAt: new Date().toISOString(),
+    createdAt: admin.firestore.Timestamp.now(),
   };
   if (data.firstName && data.lastName) {
     doc.firstName = data.firstName;

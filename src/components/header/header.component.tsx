@@ -41,6 +41,7 @@ const Header: React.FunctionComponent = () => {
   const history = useHistory();
 
   const { userState } = useUserContext();
+  const userDetails = userState?.userDoc;
 
   const signOut = () => {
     return auth
@@ -57,12 +58,29 @@ const Header: React.FunctionComponent = () => {
             mealpree
           </Typography>
         </div>
+        {userDetails && userDetails.associatedVendorId ? (
+          <Button
+            onClick={() => history.push('/myshop')}
+            color="primary"
+            variant="outlined"
+            className={classes.link}
+            size="small"
+          >
+            My Shop
+          </Button>
+        ) : null}
         {!userState ? (
-          <Button onClick={() => history.push('/signin')} color="primary" variant="outlined" className={classes.link}>
+          <Button
+            onClick={() => history.push('/signin')}
+            color="primary"
+            variant="outlined"
+            className={classes.link}
+            size="small"
+          >
             Login
           </Button>
         ) : (
-          <Button onClick={signOut} color="primary" variant="outlined" className={classes.link}>
+          <Button onClick={signOut} color="primary" variant="outlined" className={classes.link} size="small">
             Logout
           </Button>
         )}
