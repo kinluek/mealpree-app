@@ -26,3 +26,24 @@ export const createUserDocFunction = async (input: CreatUserDocInput): Promise<M
     createdAt: new firebase.firestore.Timestamp(data.createdAt._seconds, data.createdAt._nanoseconds),
   };
 };
+
+type NewMealInput = {
+  vendorId: string;
+  name: string;
+  description: string;
+  price: number; // price in pennies
+  quantity: number;
+  collectionDate: Date;
+  collectionTimeFrom: number; // in milliseconds from start of the day
+  collectionTimeTo: number; // in milliseconds from start of the day
+  orderBefore: Date;
+};
+
+export const addNewMeal = async (input: NewMealInput): Promise<void> => {
+  const data = {
+    ...input,
+    collectionDate: input.collectionDate.toISOString(),
+    orderBefore: input.orderBefore.toISOString(),
+  };
+  await functions.httpsCallable('addNewMeal')(data);
+};

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -10,9 +11,11 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useUserContext } from '../../context/user.context';
-import { useHistory } from 'react-router';
+import { Route, useHistory } from 'react-router';
 import { getMealsForVendor, getVendor } from '../../firebase/firestore';
 import Models from '../../firebase/firestore/models';
+import { convertPenceToPounds } from '../../utils/math';
+import AddMealForm from './add-meal.component';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -59,7 +62,7 @@ type MyShopState = {
   meals: Models.Meal[];
 };
 
-const MyShopPage: React.FunctionComponent = () => {
+const MyShopPage: React.FunctionComponent<RouteComponentProps> = ({ match }) => {
   const classes = useStyles();
 
   const { userState } = useUserContext();
@@ -81,44 +84,72 @@ const MyShopPage: React.FunctionComponent = () => {
 
   return (
     <React.Fragment>
-      {!shopInfo ? (
-        <Backdrop className={classes.backdrop} open>
-          <CircularProgress color="inherit" />
-        </Backdrop>
-      ) : (
-        <main>
-          {/* Hero unit */}
-          <div className={classes.heroContent}>
-            <Container maxWidth="md">
-              <Typography component="h2" variant="h2" color="inherit" align="left" gutterBottom>
-                {shopInfo.vendorDetails.businessName}
-              </Typography>
-            </Container>
-          </div>
-          <Container className={classes.cardGrid} maxWidth="md">
-            {/* End hero unit */}
-            <Grid container spacing={4}>
-              {shopInfo.meals.map((meal) => (
-                <Grid item key={meal.id} xs={12} sm={6} md={4}>
-                  <Card className={classes.card}>
-                    <CardContent className={classes.cardContent}>
-                      <Typography gutterBottom variant="h5" component="h2">
-                        {`${meal.name} - ${meal.price}p`}
-                      </Typography>
-                      <Typography>{meal.description}</Typography>
-                    </CardContent>
-                    <CardActions>
-                      <Button size="small" color="primary">
-                        order
-                      </Button>
-                    </CardActions>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Container>
-        </main>
-      )}
+      <Route
+        exact
+        path={`${match.path}/add-meal`}
+        render={() =>
+          shopInfo && shopInfo.vendorDetails.id ? <AddMealForm vendorId={shopInfo.vendorDetails.id} /> : null
+        }
+      />
+      <Route
+        exact
+        path={match.path}
+        render={() => (
+          <React.Fragment>
+            {!shopInfo ? (
+              <Backdrop className={classes.backdrop} open>
+                <CircularProgress color="inherit" />
+              </Backdrop>
+            ) : (
+              <main>
+                {/* Hero unit */}
+                <div className={classes.heroContent}>
+                  <Container maxWidth="md">
+                    <Typography component="h2" variant="h2" color="inherit" align="left" gutterBottom>
+                      {shopInfo.vendorDetails.businessName}
+                    </Typography>
+                  </Container>
+                </div>
+                <Container maxWidth="md">
+                  <Button
+                    onClick={() => history.push(`${match.path}/add-meal`)}
+                    color="primary"
+                    variant="outlined"
+                    size="small"
+                  >
+                    Add meal
+                  </Button>
+                </Container>
+                <Container className={classes.cardGrid} maxWidth="md">
+                  {/* End hero unit */}
+                  <Grid container spacing={4}>
+                    {shopInfo.meals.map((meal) => (
+                      <Grid item key={meal.id} xs={12} sm={6} md={4}>
+                        <Card className={classes.card}>
+                          <CardContent className={classes.cardContent}>
+                            <Typography gutterBottom variant="h6" component="h5">
+                              {`${meal.name}`}
+                            </Typography>
+                            <Typography gutterBottom variant="h6" component="h5">
+                              {`£${convertPenceToPounds(meal.price)}`}
+                            </Typography>
+                            <Typography>{meal.description}</Typography>
+                          </CardContent>
+                          <CardActions>
+                            <Button size="small" color="primary">
+                              Edit
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Container>
+              </main>
+            )}
+          </React.Fragment>
+        )}
+      />
     </React.Fragment>
   );
 };

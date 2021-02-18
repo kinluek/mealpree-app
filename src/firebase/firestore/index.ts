@@ -37,7 +37,7 @@ export const getUser = (userId: string): firebase.firestore.DocumentReference<fi
 export const getVendor = async (vendorId: string): Promise<Models.Vendor> => {
   const snapshot = await firestore.doc(`vendors/${vendorId}`).get();
   if (!snapshot.exists) throw new Error(`vendor ${vendorId} does not exist`);
-  return snapshot.data() as Models.Vendor;
+  return { id: snapshot.id, ...snapshot.data() } as Models.Vendor;
 };
 
 export const getMealsForVendor = async (vendorId: string): Promise<Models.Meal[]> => {

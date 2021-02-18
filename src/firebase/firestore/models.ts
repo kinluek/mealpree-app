@@ -28,6 +28,7 @@ namespace Models {
    * Represents the Vendors collection schema.
    */
   export type Vendor = {
+    id?: string;
     ownerId: string; // references a user
     businessName: string;
     location: firebase.firestore.GeoPoint;
@@ -50,6 +51,11 @@ namespace Models {
     id?: string;
     price: number; // price in pennies
     name: string;
+    quantity: number;
+    collectionDate: firebase.firestore.Timestamp;
+    collectionFrom: number;
+    collectionTo: number;
+    orderBefore: firebase.firestore.Timestamp;
     description: string;
     createdAt: Date;
   };
