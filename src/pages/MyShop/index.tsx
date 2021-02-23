@@ -15,7 +15,7 @@ import { Route, useHistory } from 'react-router';
 import { getMealsForVendor, getVendor } from '../../firebase/firestore';
 import Models from '../../firebase/firestore/models';
 import { convertPenceToPounds } from '../../utils/math';
-import AddMealForm from './add-meal.component';
+import AddMealForm from './AddMeal';
 
 const useStyles = makeStyles((theme) => ({
   icon: {

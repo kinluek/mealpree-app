@@ -1,9 +1,9 @@
 import React from 'react';
-import SignInPage from './pages/sign-in/sign-in.page';
-import SignUpPage from './pages/sign-up/sign-up.page';
-import HomePage from './pages/home-page/homepage.page';
-import MyShopPage from './pages/my-shop/my-shop.page';
-import Header from './components/header/header.component';
+import SignInPage from './pages/SignIn';
+import SignUpPage from './pages/SignUp';
+import HomePage from './pages/Home';
+import MyShopPage from './pages/MyShop';
+import Header from './components/Header';
 import UserProvider from './context/user.context';
 import { Route, Switch } from 'react-router';
 import CssBaseline from '@material-ui/core/CssBaseline';
