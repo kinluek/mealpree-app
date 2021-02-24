@@ -10,9 +10,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useState } from 'react';
 import { useHistory } from 'react-router';
-import { signInWithEmailAndPassword, signInWithGoogle } from '../../firebase/auth';
-import { setAndGetUser } from '../../firebase/firestore';
-import { useUserContext } from '../../context/user.context';
+import { useSelector, useDispatch } from 'react-redux';
+import { signInWithEmailAndPasswordThunk, signInWithGoogleThunk, clearSignInErrorAction } from '../../state/user';
+import type { RootState } from '../../state/types';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,50 +40,38 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SignInPage: React.FunctionComponent = () => {
-  const { userState, setUserState } = useUserContext();
-
   const classes = useStyles();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<Error | null>(null);
-
   const history = useHistory();
 
-  if (userState?.userDoc) {
+  const [loginDetails, setLoginDetails] = useState({ email: '', password: '' });
+
+  const dispatch = useDispatch();
+  const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
+  const signInError = useSelector((state: RootState) => state.user.signingInError);
+
+  if (isAuthed) {
     history.push('/');
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    try {
-      const { user } = await signInWithEmailAndPassword(email, password);
-      if (!user) throw new Error('error signing in');
-      const { userDoc } = await setAndGetUser(user);
-      setUserState({ user, userDoc: userDoc });
-    } catch (error) {
-      console.log(error);
-      setError(error);
-    }
+    const { email, password } = loginDetails;
+    signInWithEmailAndPasswordThunk(email, password);
+    setLoginDetails({ email: '', password: '' });
   };
 
   const handleGoogleSignIn = async () => {
-    try {
-      const { user } = await signInWithGoogle();
-      if (!user) throw new Error('error signing in');
-      const { userDoc } = await setAndGetUser(user);
-      setUserState({ user, userDoc: userDoc });
-    } catch (error) {
-      console.log(error);
-      setError(error);
-    }
+    dispatch(signInWithGoogleThunk());
+    setLoginDetails({ email: '', password: '' });
   };
 
+  const { email, password } = loginDetails;
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
-        {error ? (
-          <Alert className={classes.alert} severity="error" onClick={() => setError(null)}>
-            {error.message}
+        {signInError ? (
+          <Alert className={classes.alert} severity="error" onClick={() => dispatch(clearSignInErrorAction())}>
+            {signInError.message}
           </Alert>
         ) : null}
         <Typography component="h1" variant="h5">
@@ -101,7 +89,7 @@ const SignInPage: React.FunctionComponent = () => {
             autoComplete="email"
             autoFocus
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => setLoginDetails({ ...loginDetails, email: e.target.value })}
           />
           <TextField
             variant="outlined"
@@ -114,7 +102,7 @@ const SignInPage: React.FunctionComponent = () => {
             id="password"
             autoComplete="current-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setLoginDetails({ ...loginDetails, password: e.target.value })}
           />
           <FormControlLabel control={<Checkbox value="remember" color="primary" />} label="Remember me" />
           <Button type="submit" fullWidth variant="contained" color="default" className={classes.submit}>

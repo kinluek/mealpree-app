@@ -10,12 +10,13 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
-import { useUserContext } from '../../context/user.context';
 import { Route, useHistory } from 'react-router';
 import { getMealsForVendor, getVendor } from '../../firebase/firestore';
 import Models from '../../firebase/firestore/models';
 import { convertPenceToPounds } from '../../utils/math';
 import AddMealForm from './AddMeal';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../state/types';
 
 const useStyles = makeStyles((theme) => ({
   icon: {
@@ -64,23 +65,21 @@ type MyShopState = {
 
 const MyShopPage: React.FunctionComponent<RouteComponentProps> = ({ match }) => {
   const classes = useStyles();
-
-  const { userState } = useUserContext();
   const history = useHistory();
 
-  if (!userState?.userDoc?.associatedVendorId) {
+  const isVendorAdmin = useSelector((state: RootState) => state.user.isVendorAdmin);
+  const vendorId = useSelector((state: RootState) => state.user.vendorId);
+  const [shopInfo, setShopInfo] = useState<MyShopState | null>(null);
+
+  if (!isVendorAdmin) {
     history.push('/');
   }
 
-  const [shopInfo, setShopInfo] = useState<MyShopState | null>(null);
-
   useEffect(() => {
-    if (userState?.userDoc?.associatedVendorId) {
-      getShopInfo(userState.userDoc.associatedVendorId)
-        .then((info) => setShopInfo(info))
-        .catch(console.log);
-    }
-  }, [userState?.userDoc?.associatedVendorId]);
+    getShopInfo(vendorId)
+      .then((info) => setShopInfo(info))
+      .catch(console.log);
+  }, [vendorId]);
 
   return (
     <React.Fragment>

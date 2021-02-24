@@ -5,8 +5,9 @@ import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import { useHistory } from 'react-router';
-import { useUserContext } from '../../context/user.context';
 import { auth } from '../../firebase/auth';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../state/types';
 
 const useStyles = makeStyles((theme) => ({
   '@global': {
@@ -40,8 +41,8 @@ const Header: React.FunctionComponent = () => {
   const classes = useStyles();
   const history = useHistory();
 
-  const { userState } = useUserContext();
-  const userDetails = userState?.userDoc;
+  const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
+  const isVendorAdmin = useSelector((state: RootState) => state.user.isVendorAdmin);
 
   const signOut = () => {
     return auth
@@ -58,7 +59,7 @@ const Header: React.FunctionComponent = () => {
             mealpree
           </Typography>
         </div>
-        {userDetails && userDetails.associatedVendorId ? (
+        {isVendorAdmin ? (
           <Button
             onClick={() => history.push('/myshop')}
             color="primary"
@@ -69,7 +70,7 @@ const Header: React.FunctionComponent = () => {
             My Shop
           </Button>
         ) : null}
-        {!userState ? (
+        {!isAuthed ? (
           <Button
             onClick={() => history.push('/signin')}
             color="primary"

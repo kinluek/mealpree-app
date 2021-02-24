@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -10,9 +11,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import { useHistory } from 'react-router';
-import { createUserWithEmailAndPassword } from '../../firebase/auth';
-import { useUserContext } from '../../context/user.context';
-import { setAndGetUser } from '../../firebase/firestore';
+import { useSignUpWithEmailAndPassword, clearSignInErrorAction } from '../../state/user';
+import type { RootState } from '../../state/types';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -40,53 +40,29 @@ const useStyles = makeStyles((theme) => ({
 
 const SignUpPage: React.FunctionComponent = () => {
   const classes = useStyles();
-
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmedPassword, setConfirmedPassword] = useState('');
-  const [error, setError] = useState<Error | null>(null);
-
-  const { userState, setUserState } = useUserContext();
   const history = useHistory();
 
-  if (userState) {
+  const dispatch = useDispatch();
+  const isAuthed = useSelector((state: RootState) => state.user.isAuthed);
+  const error = useSelector((state: RootState) => state.user.signingInError);
+  const { signUpDetails, setSignUpDetails, handleSubmit } = useSignUpWithEmailAndPassword();
+
+  if (isAuthed) {
     history.push('/');
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    try {
-      if (!firstName) {
-        throw new Error('please enter first name');
-      }
-      if (!lastName) {
-        throw new Error('please enter last name');
-      }
-      if (!email) {
-        throw new Error('please enter email');
-      }
-      if (!password) {
-        throw new Error('please enter password');
-      }
-      if (confirmedPassword !== password) {
-        throw new Error('passwords do not match');
-      }
-
-      const user = await createUserWithEmailAndPassword(email, password);
-      const { userDoc } = await setAndGetUser(user, { firstName, lastName, email });
-      setUserState({ user, userDoc: userDoc });
-    } catch (error) {
-      setError(error);
-    }
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSignUpDetails({ ...signUpDetails, [name]: value });
   };
+
+  const { firstName, lastName, email, password, confirmPassword } = signUpDetails;
 
   return (
     <Container component="main" maxWidth="xs">
       <div className={classes.paper}>
         {error ? (
-          <Alert className={classes.alert} severity="error" onClick={() => setError(null)}>
+          <Alert className={classes.alert} severity="error" onClick={() => dispatch(clearSignInErrorAction())}>
             {error.message}
           </Alert>
         ) : null}
@@ -106,7 +82,7 @@ const SignUpPage: React.FunctionComponent = () => {
                 label="First Name"
                 autoFocus
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => onChange(e)}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -119,7 +95,7 @@ const SignUpPage: React.FunctionComponent = () => {
                 name="lastName"
                 autoComplete="lname"
                 value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
+                onChange={(e) => onChange(e)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -132,7 +108,7 @@ const SignUpPage: React.FunctionComponent = () => {
                 name="email"
                 autoComplete="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => onChange(e)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -146,7 +122,7 @@ const SignUpPage: React.FunctionComponent = () => {
                 id="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => onChange(e)}
               />
             </Grid>
             <Grid item xs={12}>
@@ -158,8 +134,8 @@ const SignUpPage: React.FunctionComponent = () => {
                 label="Confirm Password"
                 type="password"
                 id="confirmPassword"
-                value={confirmedPassword}
-                onChange={(e) => setConfirmedPassword(e.target.value)}
+                value={confirmPassword}
+                onChange={(e) => onChange(e)}
               />
             </Grid>
             <Grid item xs={12}>
